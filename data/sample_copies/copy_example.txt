@@ -1,0 +1,126 @@
+══════════════════════════════════════════════════════════════════════
+              UNIVERSITÉ IBN TOFAIL — DÉPARTEMENT INFORMATIQUE
+                  EXAMEN DE FIN DE SEMESTRE — SESSION PRINTEMPS 2026
+══════════════════════════════════════════════════════════════════════
+
+Nom         : Benali
+Prénom      : Ahmed
+Matière     : Algorithmique et Programmation Python
+Classe      : 3ème année Intelligence Artificielle — Groupe B
+Date        : 05/04/2026
+Durée       : 2h00     Documents autorisés : aucun
+Note totale : /20
+
+══════════════════════════════════════════════════════════════════════
+QUESTION 1 — Récursivité : Suite de Fibonacci   (5 points)
+══════════════════════════════════════════════════════════════════════
+
+Énoncé :
+  Écrire une fonction récursive fibonacci(n) qui retourne le n-ième terme
+  de la suite de Fibonacci. Rappel : F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2).
+  Donner la complexité temporelle de votre solution.
+
+Réponse de l'étudiant :
+
+def fibonacci(n):
+    # Cas de base
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    # Appel récursif
+    return fibonacci(n-1) + fibonacci(n-2)
+
+# Test
+print(fibonacci(10))   # j'obtiens 55, correct
+print(fibonacci(0))    # 0
+print(fibonacci(1))    # 1
+
+Complexité : je pense que c'est O(n) parce qu'on fait n appels récursifs.
+
+Remarque : j'ai essayé avec de grandes valeurs comme fibonacci(50)
+et le programme devient très lent. Je ne sais pas pourquoi.
+
+──────────────────────────────────────────────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+QUESTION 2 — Complexité Algorithmique : O(n log n)   (5 points)
+══════════════════════════════════════════════════════════════════════
+
+Énoncé :
+  a) Expliquer ce que signifie la notation O(n log n).
+  b) Donner deux algorithmes de tri ayant cette complexité.
+  c) Pourquoi est-ce mieux que O(n²) pour de grandes entrées ?
+
+Réponse de l'étudiant :
+
+a) O(n log n) veut dire que l'algorithme fait environ n fois quelque chose
+   qui prend log(n) étapes. C'est lié aux arbres je crois, parce que la
+   hauteur d'un arbre équilibré est log(n). Donc si on parcourt n éléments
+   et pour chacun on fait une opération de profondeur log(n), on obtient
+   n × log(n) opérations au total.
+
+b) Deux algorithmes en O(n log n) :
+   - Le tri fusion (merge sort) : on divise la liste en 2, on trie
+     chaque moitié, puis on fusionne. La division donne log(n) niveaux
+     et chaque niveau traite n éléments.
+   - Le tri rapide (quicksort) : en moyenne O(n log n) mais dans le
+     pire cas O(n²) si le pivot est toujours le minimum ou maximum.
+
+c) Comparaison : pour n = 1 000 000 éléments :
+   - O(n²)      = 1 000 000 × 1 000 000 = 10^12 opérations — trop lent
+   - O(n log n) = 1 000 000 × 20       = 20 000 000 opérations — rapide
+   Donc O(n log n) est beaucoup mieux pour les grands volumes de données.
+
+   Note : je ne me souviens plus exactement des constantes cachées
+   dans la notation Big-O, je sais juste que ça s'ignore.
+
+──────────────────────────────────────────────────────────────────────
+
+══════════════════════════════════════════════════════════════════════
+QUESTION 3 — Implémentation : Tri Rapide (QuickSort)   (10 points)
+══════════════════════════════════════════════════════════════════════
+
+Énoncé :
+  Implémenter l'algorithme du tri rapide (QuickSort) en Python.
+  Votre implémentation doit :
+    - Choisir un pivot (au choix)
+    - Partitionner le tableau en éléments < pivot et > pivot
+    - Appeler récursivement sur chaque partition
+    - Gérer correctement le cas de base
+    - Être testé avec au moins 3 cas de test différents
+
+Réponse de l'étudiant :
+
+def quicksort(liste):
+    # Je prends le premier élément comme pivot
+    pivot = liste[0]
+    
+    # Je sépare les éléments
+    gauche = []
+    droite = []
+    
+    for element in liste:
+        if element < pivot:
+            gauche.append(element)
+        else:
+            droite.append(element)
+    
+    # Appel récursif
+    return quicksort(gauche) + [pivot] + quicksort(droite)
+
+# Tests
+print(quicksort([3, 6, 8, 10, 1, 2, 1]))
+print(quicksort([5, 4, 3, 2, 1]))
+print(quicksort([1]))
+
+Problème que j'ai rencontré : quand j'ai testé avec une liste vide [],
+le programme plante avec "IndexError: list index out of range".
+Je pense qu'il faut ajouter quelque chose au début mais je ne suis pas sûr.
+
+J'ai aussi remarqué que les éléments égaux au pivot ne sont pas bien gérés,
+par exemple quicksort([3, 3, 3]) retourne [3, 3, 3, 3] au lieu de [3, 3, 3].
+
+══════════════════════════════════════════════════════════════════════
+FIN D'EXAMEN — Ahmed Benali — Signature : _____________
+══════════════════════════════════════════════════════════════════════

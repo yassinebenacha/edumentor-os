@@ -1,0 +1,177 @@
+══════════════════════════════════════════════════════════════════════
+          COURS : LA RÉCURSION EN PYTHON
+          Niveau : 3ème année Informatique / Intelligence Artificielle
+          Durée estimée : 1h30
+══════════════════════════════════════════════════════════════════════
+
+1. QU'EST-CE QUE LA RÉCURSION ?
+───────────────────────────────
+
+La récursion est une technique de programmation où une fonction s'appelle
+elle-même pour résoudre un problème en le décomposant en sous-problèmes
+plus petits et identiques.
+
+Toute fonction récursive doit obligatoirement posséder :
+
+  1) UN CAS DE BASE    : la condition d'arrêt qui stoppe la récursion.
+                         Sans elle, la fonction boucle indéfiniment et
+                         Python lève une RecursionError (limite ~1000).
+
+  2) UN APPEL RÉCURSIF : l'appel à soi-même avec un argument PLUS PETIT
+                         qui se rapproche du cas de base à chaque étape.
+
+Analogie : une poupée russe (matriochka). On ouvre la grande → on trouve
+une plus petite → encore plus petite → jusqu'à la toute petite (cas de base).
+
+
+2. EXEMPLE 1 — FACTORIELLE
+───────────────────────────
+
+Définition mathématique : n! = n × (n-1) × ... × 2 × 1, avec 0! = 1
+
+def factorielle(n):
+    # Cas de base
+    if n == 0 or n == 1:
+        return 1
+    # Appel récursif : on réduit n à chaque fois
+    return n * factorielle(n - 1)
+
+# Tests
+print(factorielle(0))  # → 1
+print(factorielle(5))  # → 120  (5 × 4 × 3 × 2 × 1)
+print(factorielle(10)) # → 3628800
+
+Trace d'exécution pour factorielle(4) :
+  factorielle(4)
+    → 4 × factorielle(3)
+          → 3 × factorielle(2)
+                → 2 × factorielle(1)
+                      → 1          ← cas de base atteint
+                → 2 × 1 = 2
+          → 3 × 2 = 6
+    → 4 × 6 = 24  ← résultat final
+
+Complexité : O(n) en temps, O(n) en espace (pile d'appels de profondeur n).
+
+
+3. EXEMPLE 2 — SUITE DE FIBONACCI
+───────────────────────────────────
+
+La suite de Fibonacci est définie par :
+  F(0) = 0,  F(1) = 1,  F(n) = F(n-1) + F(n-2) pour n ≥ 2
+
+Séquence : 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ...
+
+def fibonacci(n):
+    if n < 0:
+        raise ValueError("n doit être un entier >= 0")
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+Problème de performance : fibonacci(50) est TRÈS lent car l'algorithme
+recalcule les mêmes valeurs des centaines de millions de fois.
+
+Exemple : fibonacci(5) appelle fibonacci(3) deux fois, fibonacci(2) trois fois.
+L'arbre d'appels croît exponentiellement → complexité O(2^n).
+
+SOLUTION : La mémoïsation (caching) évite les recalculs :
+
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fibonacci_memo(n):
+    if n <= 1:
+        return n
+    return fibonacci_memo(n - 1) + fibonacci_memo(n - 2)
+
+print(fibonacci_memo(100))  # Instantané ! Complexité : O(n)
+
+
+4. EXEMPLE 3 — PARCOURS D'ARBRES BINAIRES
+──────────────────────────────────────────
+
+La récursion est naturelle pour les structures arborescentes. Chaque nœud
+est la racine d'un sous-arbre → le problème se décompose directement.
+
+class Noeud:
+    def __init__(self, valeur, gauche=None, droite=None):
+        self.valeur = valeur
+        self.gauche = gauche
+        self.droite = droite
+
+def somme_arbre(racine):
+    """Calcule la somme de tous les nœuds d'un arbre binaire."""
+    if racine is None:
+        return 0  # cas de base : arbre vide
+    return (racine.valeur
+            + somme_arbre(racine.gauche)
+            + somme_arbre(racine.droite))
+
+def hauteur_arbre(racine):
+    """Retourne la hauteur de l'arbre (0 pour un nœud feuille)."""
+    if racine is None:
+        return -1  # convention : arbre vide a hauteur -1
+    return 1 + max(hauteur_arbre(racine.gauche),
+                   hauteur_arbre(racine.droite))
+
+# Construction d'un arbre de test :
+#         10
+#        /  \
+#       5    15
+#      / \
+#     3   7
+
+arbre = Noeud(10, Noeud(5, Noeud(3), Noeud(7)), Noeud(15))
+print(somme_arbre(arbre))   # → 40
+print(hauteur_arbre(arbre)) # → 2
+
+
+5. RÉCURSION VS ITÉRATION
+───────────────────────────
+
+                Récursion              Itération (boucle)
+              ───────────────────────────────────────────
+Lisibilité  : Souvent plus claire     Parfois plus verbeux
+Performance : Plus lente (pile)       Plus rapide (pas de pile)
+Mémoire     : O(profondeur) pile      O(1) si pas de structures
+Usage idéal : Arbres, graphes, D&C    Tableaux, calculs séquentiels
+
+RÈGLE : Toute récursion peut être transformée en itération avec une
+        pile explicite — mais la récursion est souvent plus élégante.
+
+
+6. ERREURS CLASSIQUES À ÉVITER
+────────────────────────────────
+
+❌ ERREUR 1 — Cas de base manquant :
+   def infini(n):
+       return infini(n-1)  # RecursionError immédiate !
+
+❌ ERREUR 2 — L'argument ne se rapproche pas du cas de base :
+   def probleme(n):
+       if n == 0: return 0
+       return probleme(n+1)  # n s'éloigne de 0 → infini
+
+❌ ERREUR 3 — Mauvaise complexité non anticipée :
+   fibonacci(50) recursif naïf → ~2^50 = 10^15 opérations → impossible
+
+✅ BONNE PRATIQUE : Toujours vérifier que chaque appel récursif
+   rapproche l'argument du cas de base.
+
+
+7. RÉSUMÉ
+──────────
+
+  ✅ Cas de base obligatoire pour stopper la récursion
+  ✅ Appel récursif avec argument plus petit à chaque fois
+  ✅ Utiliser @lru_cache pour éviter les recalculs (Fibonacci)
+  ✅ La récursion est idéale pour les arbres et les algorithmes D&C
+  ⚠️  Attention à la complexité : O(2^n) peut être catastrophique
+  ⚠️  Python limite la profondeur (~1000) : sys.setrecursionlimit() si besoin
+
+══════════════════════════════════════════════════════════════════════
+FIN DU COURS — La Récursion en Python
+══════════════════════════════════════════════════════════════════════

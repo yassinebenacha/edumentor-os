@@ -1,0 +1,179 @@
+══════════════════════════════════════════════════════════════════════
+BARÈME DE CORRECTION — Algorithmique et Programmation Python
+Matière : Algorithmique et Programmation Python
+Classe   : 3ème année Intelligence Artificielle
+Total    : 20 points
+══════════════════════════════════════════════════════════════════════
+
+──────────────────────────────────────────────────────────────────────
+QUESTION 1 — Récursivité : Suite de Fibonacci          (5 points)
+──────────────────────────────────────────────────────────────────────
+
+RÉPONSE ATTENDUE :
+
+def fibonacci(n):
+    if n < 0:
+        raise ValueError("n doit être un entier positif")
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+Complexité attendue : O(2^n) — exponentielle.
+Explication : chaque appel génère 2 sous-appels, formant un arbre
+binaire de profondeur n. Le nombre total de nœuds est ~2^n.
+
+CRITÈRES DE NOTATION :
+
+[1.5 pts] Logique récursive correcte
+  ✅ +1.5  si fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)
+  ⚠️  +0.75 si logique partiellement correcte (ex: un seul appel)
+  ❌  +0    si iteratif uniquement ou logique complètement fausse
+
+[1.5 pts] Cas de base
+  ✅ +1.0  si F(0)=0 ET F(1)=1 tous les deux corrects
+  ⚠️  +0.5  si un seul cas de base correct
+  ❌  +0    si aucun cas de base ou cas incorrect
+
+[1.0 pt]  Gestion des cas limites (n < 0)
+  ✅ +1.0  si validation de l'input (ValueError ou if n < 0)
+  ❌  +0    si aucune validation (acceptable mais non optimal)
+
+[1.0 pt]  Complexité correctement identifiée
+  ✅ +1.0  si O(2^n) ou exponentielle mentionnée
+  ⚠️  +0.5  si la complexité est incorrecte mais la justification logique
+  ❌  +0    si O(n) ou autre réponse sans justification
+
+ERREURS COURANTES ET PÉNALITÉS :
+  -0.5 pt  Confusion entre F(0) et F(1) (cas de base inversés)
+  -0.5 pt  Oubli du return dans les appels récursifs
+  -0.5 pt  Complexité annoncée comme O(n) sans justification
+  -0.25 pt Pas de test fourni
+  -0    pt  Pas de gestion de n<0 (acceptable au niveau 3A)
+
+NOTE : La lenteur pour fibonacci(50) signale que l'étudiant n'a pas
+compris la complexité exponentielle — c'est une lacune à signaler.
+
+──────────────────────────────────────────────────────────────────────
+QUESTION 2 — Complexité Algorithmique O(n log n)       (5 points)
+──────────────────────────────────────────────────────────────────────
+
+RÉPONSE ATTENDUE :
+
+a) O(n log n) signifie que le temps d'exécution croît proportionnellement
+   à n × log₂(n). log₂(n) représente le nombre de fois qu'on peut diviser
+   n par 2 avant d'atteindre 1. Cette complexité apparaît dans les
+   algorithmes « diviser pour régner » qui effectuent log(n) niveaux de
+   division, chaque niveau traitant n éléments au total.
+
+b) Algorithmes en O(n log n) :
+   - Tri fusion (Merge Sort) : toujours O(n log n) en tous cas
+   - Tri rapide (Quick Sort) : O(n log n) en moyenne, O(n²) au pire cas
+   - Tri par tas (Heap Sort) : toujours O(n log n) en tous cas
+   - Tri par comptage d'arbres AVL/Rouge-Noir
+
+c) Comparaison O(n²) vs O(n log n) :
+   n=1000000 : n² = 10^12 opérations vs n log n ≈ 20×10^6 opérations
+   Le rapport est n/log(n) → environ 50 000× plus rapide pour n=10^6.
+
+CRITÈRES DE NOTATION :
+
+[2.0 pts] Définition de O(n log n) — Question a
+  ✅ +2.0  si lien avec "diviser pour régner" ET explication de log(n)
+  ✅ +1.5  si explication correcte sans lien explicite avec les arbres
+  ⚠️  +1.0  si définition vague mais sens général compris
+  ❌  +0    si définition incorrecte (ex: "n fois n" ou confusion avec O(n²))
+
+[2.0 pts] Deux algorithmes corrects — Question b
+  ✅ +1.0  par algorithme correct avec complexité justifiée
+  ⚠️  +0.5  par algorithme nommé sans justification
+  ❌  +0    si algorithme en O(n²) cité comme O(n log n)
+
+[1.0 pt]  Comparaison quantitative — Question c
+  ✅ +1.0  si exemple numérique concret et conclusion correcte
+  ⚠️  +0.5  si conclusion correcte sans exemple numérique
+  ❌  +0    si comparaison absente ou incorrecte
+
+ERREURS COURANTES ET PÉNALITÉS :
+  -0.5 pt  Confusion entre base du logarithme (log₂ vs log₁₀) — mineur
+  -0.5 pt  Quicksort présenté comme toujours O(n log n) sans mentionner O(n²) worst case
+  -0.25 pt Oubli de mentionner que les constantes sont ignorées en Big-O
+
+──────────────────────────────────────────────────────────────────────
+QUESTION 3 — Implémentation : Tri Rapide (QuickSort)   (10 points)
+──────────────────────────────────────────────────────────────────────
+
+RÉPONSE ATTENDUE (implémentation correcte) :
+
+def quicksort(liste):
+    # CAS DE BASE : liste vide ou un seul élément (déjà triée)
+    if len(liste) <= 1:
+        return liste
+    
+    # Choix du pivot (median-of-three idéal, premier acceptable)
+    pivot = liste[len(liste) // 2]  # pivot au milieu recommandé
+    
+    # Partition en 3 groupes pour gérer les doublons
+    gauche  = [x for x in liste if x < pivot]
+    milieu  = [x for x in liste if x == pivot]
+    droite  = [x for x in liste if x > pivot]
+    
+    return quicksort(gauche) + milieu + quicksort(droite)
+
+# Tests attendus :
+assert quicksort([])              == []
+assert quicksort([5])             == [5]
+assert quicksort([3,1,4,1,5,9])  == [1,1,3,4,5,9]
+assert quicksort([5,4,3,2,1])    == [1,2,3,4,5]
+assert quicksort([3,3,3])        == [3,3,3]
+
+CRITÈRES DE NOTATION :
+
+[3.0 pts] Cas de base (len <= 1)
+  ✅ +3.0  si `if len(liste) <= 1: return liste` ou équivalent correct
+  ⚠️  +1.5  si cas de base partiel (ex: seulement len==0 ou len==1)
+  ❌  +0    si cas de base absent (IndexError garanti sur liste vide)
+
+[3.0 pts] Logique de partition correcte
+  ✅ +3.0  si 3 partitions (gauche < pivot, milieu == pivot, droite > pivot)
+  ⚠️  +2.0  si 2 partitions (< et >=) — correcte mais gère mal les doublons
+  ⚠️  +1.0  si partitionnement partiel ou logique inversée
+  ❌  +0    si pas de partitionnement
+
+[2.0 pts] Appel récursif correct et combinaison
+  ✅ +2.0  si return quicksort(gauche) + milieu + quicksort(droite)
+  ⚠️  +1.0  si l'appel récursif est présent mais la combinaison est fausse
+  ❌  +0    si pas d'appel récursif
+
+[2.0 pts] Tests variés (min 3 cas)
+  ✅ +2.0  si 3+ tests incluant liste vide, doublons, liste triée inversée
+  ✅ +1.0  si 1-2 tests corrects
+  ❌  +0    si aucun test ou tests triviaux uniquement
+
+ERREURS COURANTES ET PÉNALITÉS :
+  -1.0 pt  Absence du cas de base (bug IndexError sur liste vide)
+  -1.0 pt  Doublons du pivot dans liste gauche ET droite (liste triplée)
+  -0.5 pt  Pivot toujours en liste[0] sans commentaire → pire cas O(n²) sur liste triée
+  -0.5 pt  In-place vs out-of-place confondu (les deux sont acceptables)
+
+──────────────────────────────────────────────────────────────────────
+BARÈME SYNTHÉTIQUE
+──────────────────────────────────────────────────────────────────────
+
+ Q1 — Fibonacci récursif        :  /5  pts
+ Q2 — Complexité O(n log n)     :  /5  pts  
+ Q3 — Implémentation QuickSort  :  /10 pts
+                                  ────────
+ TOTAL                          :  /20 pts
+
+Grille de conversion :
+  >= 16/20 → Très Bien    (A)
+  >= 14/20 → Bien         (B)
+  >= 12/20 → Assez Bien   (C)
+  >= 10/20 → Passable     (D)
+   < 10/20 → Insuffisant  (F)
+
+══════════════════════════════════════════════════════════════════════
+FIN DU BARÈME — Algorithmique et Programmation Python
+══════════════════════════════════════════════════════════════════════

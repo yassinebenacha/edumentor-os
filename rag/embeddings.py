@@ -1,17 +1,38 @@
-# rag/embeddings.py
-# Embeddings — Centralized embedding model configuration and factory.
-#
-# Responsibilities:
-#   - Provides a get_embeddings() factory function that returns a configured
-#     LangChain Embeddings instance based on the EMBEDDING_MODEL setting in config.py.
-#   - Default: OpenAIEmbeddings with model "text-embedding-3-small" (cost-efficient,
-#     high performance for educational content retrieval).
-#   - Designed to be easily swappable: supports HuggingFace sentence-transformers
-#     as a local/offline alternative (no API key required).
-#   - Embedding dimension and model name are surfaced in config.py to ensure
-#     consistency between ingestion and retrieval phases.
-#   - Singleton pattern: embeddings instance is cached to avoid redundant
-#     initialization across multiple calls within a session.
-#
-# Libraries: langchain-openai, (optional) langchain-community for HuggingFace
-# Used by: VectorStore
+"""
+rag/embeddings.py
+Centralized embedding model factory for EduMentor-OS.
+
+Uses HuggingFace sentence-transformers running LOCALLY.
+  • No API key required
+  • No internet needed after the first download (~90 MB)
+  • Fully free and offline-capable
+
+Default model : all-MiniLM-L6-v2  (384 dims, very fast, great quality)
+Better quality : BAAI/bge-small-en-v1.5  (384 dims, slightly slower)
+Best quality   : BAAI/bge-large-en-v1.5  (1024 dims, needs more RAM)
+"""
+
+from __future__ import annotations
+
+from functools import lru_cache
+
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+from config import settings
+
+
+@lru_cache(maxsize=1)
+def get_embeddings() -> HuggingFaceEmbeddings:
+    """
+    Return the singleton HuggingFaceEmbeddings instance.
+
+    The model is downloaded once to ~/.cache/huggingface on first run,
+    then loaded from disk on every subsequent run (no internet required).
+
+    Cached with lru_cache so the model stays in memory across calls.
+    """
+    return HuggingFaceEmbeddings(
+        model_name=settings.embedding_model,
+        model_kwargs={"device": settings.embedding_device},
+        encode_kwargs={"normalize_embeddings": True},
+    )

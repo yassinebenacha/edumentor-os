@@ -1,0 +1,45 @@
+services:
+
+  # ── Main API service ─────────────────────────────────────────────────────────
+  edumentor-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: edumentor-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist ChromaDB across restarts
+      - ./data/chroma_db:/app/data/chroma_db
+      # Mount data directories for hot-ingestion without rebuild
+      - ./data/knowledge_base:/app/data/knowledge_base:ro
+      - ./data/rubrics:/app/data/rubrics:ro
+      - ./data/sample_copies:/app/data/sample_copies:ro
+      # HuggingFace model cache (avoids re-downloading on restart)
+      - hf-cache:/app/.cache/huggingface
+    env_file:
+      - .env
+    environment:
+      - CHROMA_PERSIST_DIR=/app/data/chroma_db
+      - DATA_DIR=/app/data
+      - KNOWLEDGE_BASE_DIR=/app/data/knowledge_base
+      - RUBRICS_DIR=/app/data/rubrics
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  hf-cache:
+    driver: local
